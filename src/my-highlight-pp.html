@@ -1,0 +1,69 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/nuxeo-elements/nuxeo-connection.html">
+<link rel="import" href="../bower_components/nuxeo-elements/nuxeo-page-provider.html">
+<link rel="import" href="../bower_components/nuxeo-ui-elements/nuxeo-data-table/iron-data-table.html">
+
+<dom-module id="highlight-pp">
+    <template>
+        <nuxeo-connection id="nxcon" url="http://localhost:8180/nuxeo" username="Administrator"
+                          password="Administrator"></nuxeo-connection>
+
+        <nuxeo-page-provider auto
+                         id="highlightPP"
+                         provider="default_search"
+                         params='{"ecm_fulltext":"[[input]]", "highlight":"ecm:binarytext"}'
+                         current-page={{response}} enrichers="highlight">
+        </nuxeo-page-provider>
+
+        <nuxeo-search id="saved-search"></nuxeo-search>
+
+        <paper-input
+                id="ppFullText" label="Full Text Search" class="filterItem" type="search" value="{{input}}">
+        </paper-input>
+
+        <h3>Results:</h3>
+        <nuxeo-data-table items=[[response]]>
+            <nuxeo-data-table-column name="Title">
+                <template>[[item.title]]</template>
+            </nuxeo-data-table-column>
+            <nuxeo-data-table-column name="Author">
+                <template>[[item.properties.dc:creator]]</template>
+            </nuxeo-data-table-column>
+            <nuxeo-data-table-column name="Last Modified">
+                <template>[[item.lastModified]]</template>
+            </nuxeo-data-table-column>
+            <nuxeo-data-table-column name="Highlights">
+                <template><div inner-h-t-m-l="[[item.contextParameters.highlight.ecm:binarytext]]"></div></template>
+            </nuxeo-data-table-column>
+        </nuxeo-data-table>
+        <style include="shared-styles">
+          :host {
+            display: block;
+
+            padding: 10px;
+          }
+          nuxeo-data-table {
+            height: 500px;
+          }
+        </style>
+
+    </template>
+
+    <script>
+    Polymer({
+      is: 'highlight-pp',
+      properties: {
+        input: {
+          type: String,
+          value: '',
+          notify: true,
+          observer: '_inputChanged'
+        }
+      },
+      _inputChanged: function() {
+        console.log("Value : " + this.searchTerm);
+      }
+    });
+    </script>
+</dom-module>
